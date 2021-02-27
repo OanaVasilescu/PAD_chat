@@ -11,8 +11,10 @@
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <sys/socket.h>
+#include <arpa/inet.h>
+#include <string.h>
 
-void server(int adresa_ip, int port) // adresa ip nu stiu daca e int... cred ca char mai degraba
+void server(char adresa_ip, int port) // adresa ip nu stiu daca e int... cred ca char mai degraba
 {
     int descriptor_socket;
     struct sockaddr_in adresa;
@@ -24,9 +26,9 @@ void server(int adresa_ip, int port) // adresa ip nu stiu daca e int... cred ca 
         
     }
     memset(&adresa, '\0', sizeof(adresa)); 
-	serverAdrr.sin_family=AF_INET;
-	serverAdrr.sin_port=htons(port);
-	serverAdrr.sin_addr.s_addr=inet_addr(adresa);
+	adresa.sin_family=AF_INET;
+	adresa.sin_port=htons(port);
+    adresa.sin_addr.s_addr=inet_addr(&adresa_ip); // nu stiu daca & e ok sau nu
     
     if(bind(descriptor_socket,(struct sockaddr *)& adresa, sizeof(adresa)) < 0){
         perror("server: pb cu bind");
@@ -41,6 +43,7 @@ void server(int adresa_ip, int port) // adresa ip nu stiu daca e int... cred ca 
         perror("server: pb la accept");
         exit(3);
     }
+
 }
 
 
