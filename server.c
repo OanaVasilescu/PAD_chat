@@ -18,12 +18,16 @@ void server(int adresa_ip, int port) // adresa ip nu stiu daca e int... cred ca 
     struct sockaddr_in adresa;
     int adress_len = sizeof(adresa);
     if((descriptor_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))<0){
-        // s-ar putea ca argumentele sa nu fie ok asa; la ultima chestie unii puneau 0
+        // INTREABA: s-ar putea ca argumentele sa nu fie ok asa; la ultima chestie unii puneau 0
         perror("la server nu s-a putut face socket");
         exit(0);
         
     }
-    // inainte sa trecem mai departe, cred ca aici trb sa bagam in adresa ce primim ca param la f server (adresa ip si nr port);
+    memset(&adresa, '\0', sizeof(adresa)); 
+	serverAdrr.sin_family=AF_INET;
+	serverAdrr.sin_port=htons(port);
+	serverAdrr.sin_addr.s_addr=inet_addr(adresa);
+    
     if(bind(descriptor_socket,(struct sockaddr *)& adresa, sizeof(adresa)) < 0){
         perror("server: pb cu bind");
         exit(1);
