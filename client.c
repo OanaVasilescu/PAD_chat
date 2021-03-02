@@ -21,7 +21,9 @@ void client(char adresa[], int port){
     if((connect(clientSocket, (struct sockaddr*)&serverAdrr, sizeof(serverAdrr))) <0){
         perror("client: pb la connect");
     }
+    
     else{
+        puts("conectat la server\n");
         while(1){
             printf("Enter message:");
             scanf("%s", mesaj);
