@@ -7,7 +7,7 @@
 #include <arpa/inet.h>
 
 void client(char adresa[], int port){
-    int clientSocket;
+    int clientSocket, n;
     char mesaj[2048];
     struct sockaddr_in serverAdrr;
     if ((clientSocket=socket(PF_INET, SOCK_STREAM, 0))<0){
@@ -21,20 +21,22 @@ void client(char adresa[], int port){
     if((connect(clientSocket, (struct sockaddr*)&serverAdrr, sizeof(serverAdrr))) <0){
         perror("client: pb la connect");
     }
-    
     else{
-        puts("conectat la server\n");
-        while(1){
-            printf("Enter message:");
+        printf("conectat la server\n");
+            printf("Enter message1:");
             scanf("%s", mesaj);
-            if(send(clientSocket, mesaj, strlen(mesaj), 0)<0){
-                perror("err la send mesaj");
-                exit(6);
+        n = send(clientSocket, mesaj, strlen(mesaj), 0);
+            while(n!= 0){
+                n = send(clientSocket, mesaj, strlen(mesaj), 0);
+                if(n == -1){
+                    perror("err la send mesaj");
+                    exit(6);
+                }
+                printf("Enter message:");
+                scanf("%s", mesaj);
+                if(strcmp("stop", mesaj) == 0)
+                    n = 0;
             }
-            if(strcmp("stop", mesaj) == 0){
-                break;
-            }
-        }
     }
     close(clientSocket);
 }
