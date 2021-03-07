@@ -17,8 +17,7 @@
 
 void server(char adresa_ip[], int port)
 {
-    int descriptor_socket, socket_client, n;
-    char mesaj[2048];
+    int descriptor_socket, socket_client;
     struct sockaddr_in adresa;
     int adress_len = sizeof(adresa);
     if((descriptor_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))<0){
@@ -45,16 +44,19 @@ void server(char adresa_ip[], int port)
         perror("server: pb la accept");
         exit(3);
     }
-    printf("conectat la client");
-    while((n = recv(socket_client, mesaj, strlen(mesaj), 0)) != 0){
-        if(n == -1){
-            perror("eroare la primirea mesajului");
-            exit(6);
+    puts("conectat la client");
+    while (1) {
+        char data[1024];
+        int read = recv(socket_client, data, 1024, 0);//poate alte flags?
+        if(read < 0){
+            perror("err la recv server");
+            exit(7);
         }
-        puts(mesaj);
+        data[read] = '\0';
+        puts(data);
     }
-    close(socket_client);
-    close(descriptor_socket);
+   // close(socket_client);
+   // close(descriptor_socket);
 }
 
 int main(int argc, const char * argv[]){
