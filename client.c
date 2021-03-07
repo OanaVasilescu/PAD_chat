@@ -5,14 +5,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#define BUFSIZE 1024
-#define PORT 8080
 
 void client(char adresa[], int port){
-    char *hello = "Hello from client";
-        char buffer[1024] = {0};
-   // char buf[BUFSIZE];
-    int valread;
     int clientSocket;
     struct sockaddr_in serverAdrr;
     if ((clientSocket=socket(PF_INET, SOCK_STREAM, 0))<0){
@@ -22,22 +16,35 @@ void client(char adresa[], int port){
     memset(&serverAdrr, '\0', sizeof(serverAdrr)); //Alocam un bloc de memorie doar pentru structura asta;
     serverAdrr.sin_family=AF_INET;
     serverAdrr.sin_port=htons(port);
-    serverAdrr.sin_addr.s_addr=inet_addr(adresa); // nu stiu daca e & sau fara&
-    connect(clientSocket, (struct sockaddr*)&serverAdrr, sizeof(serverAdrr));
-    
-    //recv(clientSocket, buf, sizeof(buf), 0);
-        valread = read(clientSocket , buffer, 1024);
-        printf("%s\n",buffer );
-        send(clientSocket , hello , strlen(hello) , 0 );
-        printf("Hello message sent\n");
-    
-    printf("data : %s", buffer);
+    serverAdrr.sin_addr.s_addr=inet_addr(adresa);
+    if((connect(clientSocket, (struct sockaddr*)&serverAdrr, sizeof(serverAdrr))) <0){
+        perror("client: pb la connect");
+    }
+    else{
+        puts("conectat la server\n");
+        while (1) {
+            printf("mesaj:");
+            char input[1024];
+            fgets(input, 1024, stdin);
+            send(clientSocket, input, 1024, 0);
+            printf("\n");
+            
+            
+        }
+    }
+    //close(clientSocket);
 }
 
-int main(int argc, const char * argv[]) {
-    // insert code here...
-    printf("Hello, World!\n");
-    client("127.0.0.1",8080);
+int main(int argc, const char * argv[]){
+    int port;
+    char adresaIP[14] = {0};
+    if(argc!= 3){
+        perror("nr gresit de argumente");
+        exit(5);
+    }
+    strcpy(adresaIP, argv[1]);
+    port = atoi(argv[2]);
+    client(adresaIP,port);
     return 0;
 }
 

@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <stdlib.h>
 #include <sys/socket.h>
@@ -16,12 +15,9 @@
 #include <string.h>
 #include <unistd.h>
 
-void server(char adresa_ip[], int port) // adresa ip nu stiu daca e int... cred ca char mai degraba
+void server(char adresa_ip[], int port)
 {
-    char *hello = "Hello from server";
-    char buffer[1024] = {0};
-    int valread;
-    int descriptor_socket;
+    int descriptor_socket, socket_client;
     struct sockaddr_in adresa;
     int adress_len = sizeof(adresa);
     if((descriptor_socket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP))<0){
@@ -30,9 +26,9 @@ void server(char adresa_ip[], int port) // adresa ip nu stiu daca e int... cred 
         exit(0);
         
     }
-    memset(&adresa, '\0', sizeof(adresa)); 
-	adresa.sin_family=AF_INET;
-	adresa.sin_port=htons(port);
+    memset(&adresa, '\0', sizeof(adresa));
+    adresa.sin_family=AF_INET;
+    adresa.sin_port=htons(port);
     adresa.sin_addr.s_addr=inet_addr(adresa_ip); // nu stiu daca & e ok sau nu
     
     if(bind(descriptor_socket,(struct sockaddr *)& adresa, sizeof(adresa)) < 0){
@@ -43,19 +39,35 @@ void server(char adresa_ip[], int port) // adresa ip nu stiu daca e int... cred 
         perror("server: pb la listen");
         exit(2);
     }
-    if (accept(descriptor_socket,(struct sockaddr *)& adresa, (socklen_t*)&adress_len)<0){
+    if ((socket_client = accept(descriptor_socket,(struct sockaddr *)& adresa, (socklen_t*)&adress_len))<0){
         // aici cred ca e while.. si nu stiu daca e ok cu param.
         perror("server: pb la accept");
         exit(3);
     }
-    valread = read(descriptor_socket , buffer, 1024);
-        printf("%s\n",buffer );
-        send(descriptor_socket , hello , strlen(hello) , 0 );
-        printf("Hello message sent\n");
-
+    puts("conectat la client");
+    while (1) {
+        char data[1024];
+        int read = recv(socket_client, data, 1024, 0);//poate alte flags?
+        if(read < 0){
+            perror("err la recv server");
+            exit(7);
+        }
+        data[read] = '\0';
+        puts(data);
+    }
+   // close(socket_client);
+   // close(descriptor_socket);
 }
 
 int main(int argc, const char * argv[]){
-    server("192.168.1.5", 8080);
+    int port;
+    char adresaIP[14] = {0};
+    if(argc!= 3){
+        perror("nr gresit de argumente");
+        exit(5);
+    }
+    strcpy(adresaIP, argv[1]);
+    port = atoi(argv[2]);
+    server(adresaIP,port);
 }
  
