@@ -73,12 +73,6 @@ void server(char adresa_ip[], int port)
         pthread_create(&thread_client, NULL, functie_client, &socket_client[contor]);
         contor++;
     }
-    /*
-    if(close(socket_client) < 0){
-        printf("Error! Client Socket can't be closed correctly!\n");
-        exit(EXIT_CLOSE_FUNCTION_FAILURE);
-    }
-    */
     if(close(descriptor_socket) < 0){
         printf("Error! Socket descriptor can't be closed correctly!\n");
         exit(EXIT_CLOSE_FUNCTION_FAILURE);
